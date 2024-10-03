@@ -1,4 +1,4 @@
-module awesomeProject
+module blindguessr
 
 go 1.23.1
 
