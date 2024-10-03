@@ -10,8 +10,9 @@ import (
 type Player struct {
 	name       string
 	score      int
-	game       *Game
+	room       *Room
 	connection *websocket.Conn
+	channel    *Channel
 	read       chan string
 	write      chan []byte
 }
@@ -26,7 +27,7 @@ func (p *Player) writePump() {
 func (p *Player) readPump() {
 	defer func() {
 		p.connection.Close()
-		p.game.unregister(p)
+		p.room.unregister(p)
 
 	}()
 	p.connection.SetReadLimit(1024)
@@ -51,7 +52,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func Connect(w http.ResponseWriter, r *http.Request, name string, game *Game) *Player {
+func Connect(w http.ResponseWriter, r *http.Request, name string, room *Room) *Player {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
@@ -62,18 +63,21 @@ func Connect(w http.ResponseWriter, r *http.Request, name string, game *Game) *P
 	player := &Player{
 		name:       name,
 		score:      0,
-		game:       game,
+		room:       room,
 		connection: conn,
+		channel:    NewChannel("Private " + name),
 		read:       make(chan string),
 		write:      make(chan []byte),
 	}
+
+	player.channel.players[player] = true
 
 	log.Default().Println("PLAYER CONNECTED : ", name)
 
 	go player.writePump()
 	go player.readPump()
-	
-	player.game.register(player)
+
+	player.room.register(player)
 
 	return player
 }

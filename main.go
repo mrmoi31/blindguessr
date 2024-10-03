@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	game := NewGame()
+
+	room := NewRoom()
 
 	var counter int64 = 0
 
@@ -16,12 +17,13 @@ func main() {
 
 	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		counter++
-		Connect(w, r, "Player"+strconv.FormatInt(counter, 10), game)
+		Connect(w, r, "Player"+strconv.FormatInt(counter, 10), room)
 	})
 
 	router.Handle("/", http.FileServer(http.Dir("./")))
 
+	log.Default().Println("SERVER ONLINE")
+
 	http.ListenAndServe(":8080", router)
 
-	log.Default().Println("SERVER ONLINE")
 }
