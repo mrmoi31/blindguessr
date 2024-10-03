@@ -12,10 +12,11 @@
 <body>
 
   <div hx-ext="ws" ws-connect="/ws">
-    <div id="chat" hx-swap-oob="beforeend"></div>
+    <div id="chat" hx-swap-oob="morphdom"></div>
     <form id="form" ws-send>
-      <input name="message">
+      <input id="chat-input" name="message" autofocus>
     </form>
   </div>
 </body>
+
 </html>

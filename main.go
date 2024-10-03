@@ -9,6 +9,8 @@ import (
 
 func main() {
 
+	LoadWords()
+
 	room := NewRoom()
 
 	var counter int64 = 0

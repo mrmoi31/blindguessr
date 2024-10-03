@@ -29,7 +29,7 @@ func (c Channel) broadcast() {
 					log.Default().Println("Erreur template ", err)
 					return
 				}
-				log.Default().Println(string(buffer.Bytes()))
+				log.Default().Println("Wrote for " + player.name)
 				player.write <- buffer.Bytes()
 			}
 		}

@@ -1,3 +1,5 @@
 <div id="chat" hx-swap-oob="beforeend">
     <p><span>{{ .User }}</span>: {{ .Message }}</p>
 </div>
+
+<input id="chat-input" name="message" hx-swap-oob="outerHTML" autofocus>
