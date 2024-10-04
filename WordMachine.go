@@ -3,10 +3,11 @@ package main
 import (
 	"bufio"
 	"log"
+	"math/rand"
 	"os"
 )
 
-var Words = make([]string, 0)
+var words = make([]string, 0)
 
 func LoadWords() {
 	file, err := os.Open("words.txt")
@@ -18,8 +19,12 @@ func LoadWords() {
 	fileScanner := bufio.NewScanner(file)
 
 	for fileScanner.Scan() {
-		Words = append(Words, fileScanner.Text())
+		words = append(words, fileScanner.Text())
 	}
 
 	file.Close()
+}
+
+func RandomWord() string {
+	return words[rand.Intn(len(words))]
 }

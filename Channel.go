@@ -17,7 +17,7 @@ type Message struct {
 	Message string
 }
 
-var templ, _ = template.New("message.html").ParseFiles("message.html")
+var templ, _ = template.New("message.html").ParseFiles("html/message.html")
 
 func (c Channel) broadcast() {
 	for message := range c.write {

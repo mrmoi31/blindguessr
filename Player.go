@@ -19,8 +19,8 @@ type Player struct {
 
 func (p *Player) writePump() {
 	for m := range p.write {
-		p.connection.WriteMessage(websocket.TextMessage, m)
 		log.Default().Println("PLAYER ", p.name, " WROTE ", string(m))
+		p.connection.WriteMessage(websocket.TextMessage, m)
 	}
 }
 
@@ -35,7 +35,7 @@ func (p *Player) readPump() {
 	for {
 		_, message, err := p.connection.ReadMessage()
 		if err != nil {
-			log.Default().Println(err)
+			log.Default().Println("Connection closed: ", err)
 			break
 		}
 
@@ -72,10 +72,10 @@ func Connect(w http.ResponseWriter, r *http.Request, name string, room *Room) *P
 
 	player.channel.players[player] = true
 
-	log.Default().Println("PLAYER CONNECTED : ", name)
-
 	go player.writePump()
 	go player.readPump()
+
+	log.Default().Println("PLAYER CONNECTED : ", name)
 
 	player.room.register(player)
 

@@ -1,7 +1,5 @@
 package main
 
-import "math/rand"
-
 type Game struct {
 	word     string
 	room     *Room
@@ -10,7 +8,7 @@ type Game struct {
 
 func StartGame(room *Room) {
 	game := &Game{
-		word:     Words[rand.Intn(len(Words))],
+		word:     RandomWord(),
 		room:     room,
 		finished: make(chan bool, 1),
 	}
