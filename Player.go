@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Player struct {
@@ -52,13 +54,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func Connect(w http.ResponseWriter, r *http.Request, name string, room *Room) *Player {
-	conn, err := upgrader.Upgrade(w, r, nil)
-
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
+func Register(conn *websocket.Conn, name string, room *Room) *Player {
 
 	player := &Player{
 		name:       name,
@@ -77,7 +73,84 @@ func Connect(w http.ResponseWriter, r *http.Request, name string, room *Room) *P
 
 	log.Default().Println("PLAYER CONNECTED : ", name)
 
+	landing, err := os.Open("html/game.html")
+
+	if err != nil {
+		log.Fatal("Erreur ouverture landing : ", err)
+		return nil
+	}
+
+	reader := bufio.NewReader(landing)
+
+	bytes := make([]byte, 5000)
+	_, err = reader.Read(bytes)
+	if err != nil {
+		log.Fatal("Erreur lecture landing : ", err)
+		return nil
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage, bytes)
+	if err != nil {
+		log.Fatal("Erreur write : ", err)
+		return nil
+	}
+	log.Default().Println("Wrote : ", string(bytes))
+
 	player.room.register(player)
 
 	return player
+}
+
+func Connect(w http.ResponseWriter, r *http.Request, room *Room) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal("Erreur upgrade : ", err)
+		return
+	}
+
+	landing, err := os.Open("html/landing.html")
+
+	if err != nil {
+		log.Fatal("Erreur ouverture landing : ", err)
+		return
+	}
+
+	reader := bufio.NewReader(landing)
+
+	bytes := make([]byte, 1000)
+	_, err = reader.Read(bytes)
+	if err != nil {
+		log.Fatal("Erreur lecture landing : ", err)
+		return
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage, bytes)
+	if err != nil {
+		log.Fatal("Erreur write : ", err)
+		return
+	}
+
+	go func() {
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Default().Println("Connection closed: ", err)
+				break
+			}
+
+			log.Default().Println("Username message : ", string(message))
+
+			messageMap := make(map[string]string)
+			json.Unmarshal(message, &messageMap)
+
+			username, ok := messageMap["username"]
+			if !ok {
+				log.Default().Println("No username")
+				continue
+			}
+
+			Register(conn, username, room)
+			break
+		}
+	}()
 }

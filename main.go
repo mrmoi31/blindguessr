@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func main() {
@@ -20,7 +19,7 @@ func main() {
 
 	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		counter++
-		Connect(w, r, "Player"+strconv.FormatInt(counter, 10), room)
+		Connect(w, r, room)
 	})
 
 	//router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

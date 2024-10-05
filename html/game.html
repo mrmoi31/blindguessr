@@ -1,5 +1,10 @@
-<div>
-    <form id="form">
-        <input id="chat-input" name="message" autofocus>
-    </form>
-</div>
+<main id="main" hx-swap-oob="true">
+    <div id="chat" hx-swap-oob="beforeend">
+    </div>
+
+    <div>
+        <form id="form" ws-send>
+            <input id="message" name="message" autofocus>
+        </form>
+    </div>
+</main>

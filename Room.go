@@ -28,6 +28,7 @@ func (room *Room) register(player *Player) {
 	if len(room.players) == 1 {
 		StartGame(room)
 	}
+	room.global.write <- Message{User: "Game", Message: player.name + " joined us"}
 }
 
 func (room *Room) unregister(player *Player) {
