@@ -25,10 +25,11 @@ func (room *Room) register(player *Player) {
 	go room.readPlayer(player)
 	room.global.players[player] = true
 
+	room.global.write <- Message{User: "Game", Message: player.name + " joined us"}
+
 	if len(room.players) == 1 {
 		StartGame(room)
 	}
-	room.global.write <- Message{User: "Game", Message: player.name + " joined us"}
 }
 
 func (room *Room) unregister(player *Player) {
