@@ -33,6 +33,15 @@ func main() {
 		open.WriteTo(w)
 	})
 
+	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		log.Default().Println("Looking for favicon")
+		open, err := os.Open("static/favicon.ico")
+		if err != nil {
+			return
+		}
+		open.WriteTo(w)
+	})
+
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		open, err := os.Open("html/index.html")
 		if err != nil {
