@@ -53,3 +53,19 @@ body {
 .message.winners {
     color: green;
 }
+
+.score {
+    font-weight: bold;
+}
+
+.score::before {
+    font-weight: normal;
+    content: ": "
+}
+
+.leaderboard-list {
+    list-style-type: none;
+}
+
+.leaderboard-username {
+}

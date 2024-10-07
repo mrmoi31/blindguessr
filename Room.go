@@ -1,6 +1,10 @@
 package main
 
-import "log"
+import (
+	"bytes"
+	"html/template"
+	"log"
+)
 
 type Room struct {
 	players map[*Player]bool
@@ -25,11 +29,13 @@ func (room *Room) register(player *Player) {
 	go room.readPlayer(player)
 	room.global.players[player] = true
 
-	room.global.write <- Message{User: "Game", Message: player.name + " joined us"}
+	room.global.write <- Message{User: "Game", Message: player.Name + " joined us"}
 
 	if len(room.players) == 1 {
-		StartGame(room)
+		go StartGame(room)
 	}
+
+	room.updateLeaderboard()
 }
 
 func (room *Room) unregister(player *Player) {
@@ -66,14 +72,15 @@ func (room *Room) play(game *Game) {
 
 func (room *Room) readPlayer(player *Player) {
 	for message := range player.read {
-		log.Default().Println("READ ", message, " ON PLAYER ", player.name)
+		log.Default().Println("READ ", message, " ON PLAYER ", player.Name)
 
 		if room.players[player] {
-			room.winners.write <- Message{User: player.name, Message: message, Visibility: VISIBILITY_WINNERS}
+			room.winners.write <- Message{User: player.Name, Message: message, Visibility: VISIBILITY_WINNERS}
 		} else if message == room.game.word {
+			player.Score++
 			room.players[player] = true
 			room.winners.players[player] = true
-			room.global.write <- Message{User: "Game", Message: player.name + " guessed the word!", Visibility: VISIBILITY_PUBLIC}
+			room.global.write <- Message{User: "Game", Message: player.Name + " guessed the word!", Visibility: VISIBILITY_PUBLIC}
 			player.channel.write <- Message{User: "Game", Message: "Good guess, the word was indeed : " + message, Visibility: VISIBILITY_PRIVATE}
 
 			if len(room.winners.players) == len(room.players) {
@@ -81,7 +88,28 @@ func (room *Room) readPlayer(player *Player) {
 				close(room.game.finished)
 			}
 		} else {
-			room.global.write <- Message{User: player.name, Message: message, Visibility: VISIBILITY_PUBLIC}
+			room.global.write <- Message{User: player.Name, Message: message, Visibility: VISIBILITY_PUBLIC}
 		}
+
+		room.updateLeaderboard()
+	}
+}
+
+func (room *Room) updateLeaderboard() {
+	leaderboardTempl := template.Must(template.ParseFiles("html/leaderboard.html"))
+	buffer := bytes.Buffer{}
+
+	arr := make([]*Player, len(room.players))
+	n := 0
+
+	for player, _ := range room.players {
+		arr[n] = player
+		n++
+	}
+
+	leaderboardTempl.Execute(&buffer, arr)
+
+	for player, _ := range room.players {
+		player.write <- buffer.Bytes()
 	}
 }

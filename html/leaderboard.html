@@ -1,0 +1,10 @@
+<div id="leaderboard" hx-swap-oob="true">
+    Leaderboard
+    <ul class="leaderboard-list">
+        {{ range .}}
+        <li>
+            <p><span class="leaderboard-username">{{ .Name }}</span><span class="score">{{ .Score }}</span></p>
+        </li>
+        {{ end }}
+    </ul>
+</div>

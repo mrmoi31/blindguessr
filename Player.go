@@ -10,8 +10,8 @@ import (
 )
 
 type Player struct {
-	name       string
-	score      int
+	Name       string
+	Score      int
 	room       *Room
 	connection *websocket.Conn
 	channel    *Channel
@@ -21,7 +21,7 @@ type Player struct {
 
 func (p *Player) writePump() {
 	for m := range p.write {
-		log.Default().Println("PLAYER ", p.name, " WROTE ", string(m))
+		// log.Default().Println("PLAYER ", p.Name, " WROTE ", string(m))
 		p.connection.WriteMessage(websocket.TextMessage, m)
 	}
 }
@@ -57,8 +57,8 @@ var upgrader = websocket.Upgrader{
 func Register(conn *websocket.Conn, name string, room *Room) *Player {
 
 	player := &Player{
-		name:       name,
-		score:      0,
+		Name:       name,
+		Score:      0,
 		room:       room,
 		connection: conn,
 		channel:    NewChannel("Private " + name),
