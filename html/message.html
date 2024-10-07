@@ -1,5 +1,5 @@
 <div id="chat" hx-swap-oob="beforeend">
-    <p><span>{{ .User }}</span>: {{ .Message }}</p>
+    <p class="message {{ .Visibility }}"><span class="author">{{ .User }}</span>: {{ .Message }}</p>
 </div>
 
 <input id="message" name="message" hx-swap-oob="true" autofocus>

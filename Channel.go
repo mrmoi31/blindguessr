@@ -6,6 +6,10 @@ import (
 	"log"
 )
 
+const VISIBILITY_PUBLIC = "public"
+const VISIBILITY_PRIVATE = "private"
+const VISIBILITY_WINNERS = "winners"
+
 type Channel struct {
 	name    string
 	write   chan Message
@@ -13,8 +17,9 @@ type Channel struct {
 }
 
 type Message struct {
-	User    string
-	Message string
+	User       string
+	Message    string
+	Visibility string
 }
 
 var templ, _ = template.New("message.html").ParseFiles("html/message.html")

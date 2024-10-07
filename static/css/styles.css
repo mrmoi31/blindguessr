@@ -41,3 +41,15 @@ body {
 #content>form>input[type="text"] {
     margin: 15px 0
 }
+
+.author {
+    font-weight: bold;
+}
+
+.message.private {
+    color: blue;
+}
+
+.message.winners {
+    color: green;
+}
