@@ -32,7 +32,7 @@ func (room *Room) register(player *Player) {
 	room.global.write <- Message{User: "Game", Message: player.Name + " joined us"}
 
 	if len(room.players) == 1 {
-		go StartGame(room)
+		go StartGame(room, 50)
 	}
 
 	room.updateLeaderboard()
@@ -56,6 +56,7 @@ func (room *Room) play(game *Game) {
 
 	room.global.write <- Message{User: "Game", Message: "New game started!", Visibility: VISIBILITY_PUBLIC}
 	log.Default().Println("Word is " + game.word)
+	go room.updateTimer()
 
 	over := <-room.game.finished
 
@@ -67,7 +68,7 @@ func (room *Room) play(game *Game) {
 		room.global.write <- Message{User: "Game", Message: "The word was : " + game.word, Visibility: VISIBILITY_PUBLIC}
 	}
 
-	StartGame(room)
+	StartGame(room, 50)
 }
 
 func (room *Room) readPlayer(player *Player) {
@@ -111,5 +112,27 @@ func (room *Room) updateLeaderboard() {
 
 	for player, _ := range room.players {
 		player.write <- buffer.Bytes()
+	}
+}
+
+func (room *Room) updateTimer() {
+	leaderboardTempl := template.Must(template.ParseFiles("html/timer.html"))
+	buffer := bytes.Buffer{}
+
+	time := -1
+
+	for {
+		if time != room.game.RemainingTime() {
+
+			time = room.game.RemainingTime()
+
+			leaderboardTempl.Execute(&buffer, room.game.RemainingTime())
+
+			for player, _ := range room.players {
+				player.write <- buffer.Bytes()
+			}
+
+			buffer.Reset()
+		}
 	}
 }

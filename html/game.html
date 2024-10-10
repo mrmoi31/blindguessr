@@ -1,14 +1,22 @@
 <main id="main" hx-swap-oob="true">
-    <div id="leaderboard">
-        ...
-    </div>
+    <div id="game">
+        <div id="left-panel">
+            <div id="leaderboard">
+                ...
+            </div>
 
-    <div id="chat" hx-swap-oob="beforeend">
-    </div>
+            <p id="timer" hx-swap-oob="true">-1</p>
+        </div>
 
-    <div>
-        <form id="form" ws-send>
-            <input id="message" name="message" autofocus>
-        </form>
+        <div id="right-panel">
+            <div id="chat" hx-swap-oob="beforeend">
+            </div>
+
+            <div>
+                <form id="form" ws-send>
+                    <input id="message" name="message" autofocus>
+                </form>
+            </div>
+        </div>
     </div>
 </main>
